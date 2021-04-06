@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gal.teis;
+package gal.teis.negocio;
 
-import gal.teis.dao.Contacto;
-import gal.teis.util.HibernateUtil;
-import gal.teis.dao.ContactosDAO;
+import gal.teis.presistencia.HibernateUtil;
+import gal.teis.presistencia.ContactosDAO;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

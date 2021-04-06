@@ -1,4 +1,4 @@
-package gal.teis.util;
+package gal.teis.presistencia;
 
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;

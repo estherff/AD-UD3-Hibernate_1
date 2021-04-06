@@ -17,9 +17,9 @@ import org.hibernate.cfg.Configuration;
  */
 public class HibernateUtil {
 
-    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static final SessionFactory laSessionFactory = crearSessionFactory();
  
-    private static SessionFactory buildSessionFactory() {
+    private static SessionFactory crearSessionFactory() {
         try {
             // Create the SessionFactory from hibernate.cfg.xml
             return new Configuration().configure().
@@ -34,7 +34,7 @@ public class HibernateUtil {
     }
  
     public static SessionFactory getSessionFactory() {
-        return sessionFactory;
+        return laSessionFactory;
     }
  
     public static void shutdown() {

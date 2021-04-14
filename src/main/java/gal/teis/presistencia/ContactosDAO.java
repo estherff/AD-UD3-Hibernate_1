@@ -5,7 +5,7 @@
  */
 package gal.teis.presistencia;
 
-import gal.teis.negocio.Contacto;
+import gal.teis.modelo.Contacto;
 import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

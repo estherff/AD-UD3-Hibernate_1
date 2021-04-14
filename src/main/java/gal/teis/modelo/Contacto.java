@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gal.teis.negocio;
+package gal.teis.modelo;
 
 import java.io.Serializable;
 

@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gal.teis.negocio;
+package gal.teis.aplicacion;
 
+import gal.teis.modelo.Contacto;
 import gal.teis.presistencia.HibernateUtil;
 import gal.teis.presistencia.ContactosDAO;
 import java.util.List;

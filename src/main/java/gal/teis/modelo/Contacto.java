@@ -31,7 +31,7 @@ public class Contacto implements Serializable {
      */
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)//autoincremental
-    private int id;
+    private long id;
     @Column(name = "nombre", length = 45, nullable = false)
     private String nombre;
     @Column(name = "email", length = 45, nullable = false)
@@ -88,7 +88,7 @@ public class Contacto implements Serializable {
 
     @Override
     public String toString() {
-        return "Contacto: " + id + ", nombre: " + nombre + ", teléfono: " + telefono + ", emal: " + email;
+        return "Contacto: " + id + ", nombre: " + nombre + ", teléfono: " + telefono + ", email: " + email;
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Contacto implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((nombre == null) ? 0 : telefono.hashCode());
-        result = prime * result + id;
+        result = (int) (prime * result + id);
         result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
         return result;
     }

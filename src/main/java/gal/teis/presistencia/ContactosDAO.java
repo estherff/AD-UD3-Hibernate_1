@@ -7,6 +7,7 @@ package gal.teis.presistencia;
 
 import gal.teis.modelo.Contacto;
 import java.util.List;
+import java.util.Objects;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -23,8 +24,8 @@ public class ContactosDAO {
     /**
      * Objeto Session y Transaction para porder realizar operaciones sobre la BD
      */
-    private Session sesion;
-    private Transaction transa;
+    private static Session sesion;
+    private static Transaction transa;
 
     /**
      * obtenemos una referencia a "SessionFactory" usando nuestra clase de
@@ -34,9 +35,13 @@ public class ContactosDAO {
      * transacción y obtenemos una referencia a ella con "beginTransaction()"
      *
      */
-    private void iniciaOperacion() throws HibernateException {
-        sesion = HibernateUtil.getSessionFactory().openSession();
-        transa = sesion.beginTransaction();
+    private static void iniciaOperacion() throws HibernateException {
+        try {
+            sesion = HibernateUtil.getSessionFactory().openSession();
+            transa = sesion.beginTransaction();
+        } catch (HibernateException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -44,7 +49,7 @@ public class ContactosDAO {
      * ejecutando se deshaga y se relance la excepción (podríamos lanzar una
      * excepción propia)
      */
-    private void manejaExcepcion(HibernateException he) throws HibernateException {
+    private static void manejaExcepcion(HibernateException he) {
         transa.rollback();
         throw new HibernateException("Ha sucedido un error en la capa de acceso a datos", he);
     }
@@ -59,19 +64,20 @@ public class ContactosDAO {
      * Permite guardar un contacto en la BD
      *
      * @param contacto Contacto, elemento a insertar en la BD
-     * @return
+     * @return devuelve el id generado para el elemento guardado o -1 si la
+     * operación no se ha podido realizar
      */
-    public int guardaContacto(Contacto contacto) {
-        int id = 0;
-
+    public static long guardaContacto(Contacto contacto) {
+        long id = -1;
         try {
+            //abre la sesión e inicia la transición
             iniciaOperacion();
-            //guarda el contacto en la base de datos y devuelve el id generado
-            id = (int) sesion.save(contacto);
+            /*guarda el contacto en la base de datos y devuelve el id generado
+            aquí no se usa, pero se podría utilizar*/
+            id = (long) sesion.save(contacto);
             transa.commit();
         } catch (HibernateException he) {
             manejaExcepcion(he);
-            throw he;
         } finally {
             sesion.close();
         }
@@ -79,41 +85,62 @@ public class ContactosDAO {
     }
 
     /**
-     * Permite actualizar un contacto en la BD
+     * Permite actualizar un contacto en la BD a partir del id que lo identifica
      *
      * @param contacto Contacto, elemento a actualizar
      * @throws HibernateException
      */
-    public void actualizaContacto(Contacto contacto) throws HibernateException {
+    public static boolean actualizaContacto(Contacto contacto) {
+        boolean actualizado = false;
+
         try {
+            //abre la sesión e inicia la transición
             iniciaOperacion();
+
+            //Actualiza el contacto 
             sesion.update(contacto);
             transa.commit();
+            actualizado = true;
+
         } catch (HibernateException he) {
             manejaExcepcion(he);
-            throw he;
         } finally {
             sesion.close();
         }
+        return actualizado;
     }
 
     /**
-     * Elimina el contacto en la BD
+     * Elimina el contacto en la BD Previamente lo obtiene de la BD para
+     * confirmar que existe
      *
      * @param contacto Contacto, elemento a eliminar
+     * @return si la operación ha sido realizada con éxito, devuelve true
      * @throws HibernateException
      */
-    public void eliminaContacto(Contacto contacto) throws HibernateException {
+    public static boolean eliminaContacto(long id) {
+
+        boolean eliminado = false;
         try {
+            //abre la sesión e inicia la transición
             iniciaOperacion();
-            sesion.delete(contacto);
-            transa.commit();
+
+            //Antes de eliminar el objeto debe ser recuperado de la BD con get
+            Contacto contacto_get = sesion.get(Contacto.class, id);
+
+            //Elimina el contacto persistente si existe
+            if (!Objects.isNull(contacto_get)) {
+                sesion.delete(contacto_get);
+                transa.commit();
+                eliminado = true;
+            }
+
         } catch (HibernateException he) {
             manejaExcepcion(he);
-            throw he;
         } finally {
             sesion.close();
         }
+        return eliminado;
     }
 
     /**
@@ -125,12 +152,18 @@ public class ContactosDAO {
      * @return
      * @throws HibernateException
      */
-    public Contacto obtenContacto(int idContacto) throws HibernateException {
+    public static Contacto obtenContacto(long id) {
         Contacto contacto = null;
+        boolean obtenido = false;
 
         try {
+            //abre la sesión e inicia la transición
             iniciaOperacion();
-            contacto = (Contacto) sesion.get(Contacto.class, idContacto);
+
+            contacto = sesion.get(Contacto.class, id);
+            transa.commit();
+        } catch (HibernateException he) {
+            manejaExcepcion(he);
         } finally {
             sesion.close();
         }
@@ -143,12 +176,15 @@ public class ContactosDAO {
      * @return devuleve un ojeto List con todos los contactos de la BD
      * @throws HibernateException
      */
-    public List<Contacto> obtenListaContactos() throws HibernateException {
+    public static List<Contacto> obtenListaContactos() {
         List<Contacto> listaContactos = null;
 
         try {
+            //abre la sesión e inicia la transición
             iniciaOperacion();
             listaContactos = sesion.createQuery("from Contacto").list();
+        } catch (HibernateException he) {
+            manejaExcepcion(he);
         } finally {
             sesion.close();
         }
